@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CryptoAI Quest</title>
+    <style>
+        /* Basic Styles */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #000; /* Black */
+            color: #fff; /* White */
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative; /* For decorative elements */
+        }
+
+        /* Header Styles */
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            padding: 15px 30px; /* Reduced horizontal padding */
+            background: #333; /* Dark Grey */
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+            display: flex;
+            justify-content: center; /* Center the header content */
+            align-items: center;
+            border-bottom: 3px solid #fff; /* White line at the bottom of the header */
+        }
+
+        .header-content {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Reduced gap between icons and logo */
+        }
+
+        header h1 {
+            font-size: 32px;
+            color: #fff; /* White */
+            font-weight: bold;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        header a {
+            color: #fff; /* White */
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 28px;
+            height: 28px;
+            transition: transform 0.3s;
+        }
+
+        header a:hover {
+            transform: scale(1.2); /* Enlarge on hover */
+        }
+
+        /* Container Styles */
+        #container {
+            width: 90%;
+            max-width: 1200px;
+            background-color: #111; /* Very Dark Grey */
+            border-radius: 10px;
+            padding: 50px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            margin-top: 150px; /* Pushed down further due to header */
+            z-index: 2;
+            position: relative;
+            border: 2px solid #444; /* Dark Grey Border */
+            display: flex;
+            flex-direction: column; /* Column layout */
+            align-items: center;
+            gap: 30px;
+        }
+
+        /* Text and Image Sections */
+        .text-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .image-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* AI Image Heading */
+        .image-section h2 {
+            margin-bottom: 10px;
+            font-size: 22px;
+            color: #fff; /* White */
+        }
+
+        /* Progress Bar */
+        .progress-container {
+            width: 100%;
+            background-color: #333; /* Dark Grey Background */
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            height: 20px;
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background-color: #ff0000; /* Red */
+            transition: width 3s ease-in-out;
+        }
+
+        /* Chapter Images */
+        .chapter-image {
+            width: 100%;
+            max-width: 400px;
+            border-radius: 5px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            opacity: 0;
+            transform: scale(0.8);
+            transition: opacity 1s ease, transform 1s ease;
+            display: none; /* Hidden by default */
+        }
+
+        .chapter-image.visible {
+            opacity: 1;
+            transform: scale(1);
+            display: block; /* Show the image */
+        }
+
+        /* Buttons */
+        .option-btn {
+            margin: 10px 0;
+            padding: 15px 20px;
+            font-size: 20px;
+            color: #fff; /* White */
+            background-color: #333; /* Dark Grey */
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+            width: 100%; /* Full width for vertical arrangement */
+            max-width: 500px; /* Maximum width for better readability */
+            text-align: center;
+        }
+
+        .options-container {
+            display: flex;
+            flex-direction: column; /* Vertical arrangement */
+            align-items: stretch;
+            width: 100%;
+            gap: 15px;
+        }
+
+        .option-btn:hover {
+            background-color: #ff0000; /* Red on hover */
+            transform: translateY(-2px);
+            box-shadow: 0 6px 10px rgba(0,0,0,0.4);
+        }
+
+        .disabled {
+            background-color: #555;
+            opacity: 0.6;
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        .selected {
+            background-color: #ff0000; /* Red for selected option */
+            color: #fff; /* White for better readability */
+            cursor: not-allowed;
+            box-shadow: none;
+        }
+
+        #thinking {
+            display: none;
+            font-style: italic;
+            margin: 20px 0;
+            color: #fff; /* White */
+        }
+
+        /* Start Screen Styles */
+        #start-screen {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            height: 100vh;
+            padding: 20px;
+            z-index: 2;
+            position: relative;
+            background: none; /* Removed background */
+            border: none; /* Removed border */
+            border-radius: 0; /* Removed rounded corners */
+            box-shadow: none; /* Removed shadow */
+        }
+
+        #start-screen h1 {
+            font-size: 36px;
+            margin-bottom: 20px;
+            color: #fff; /* White */
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+        }
+
+        #start-screen p {
+            font-size: 20px;
+            margin-bottom: 30px;
+            color: #fff; /* White */
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+        }
+
+        #start-btn {
+            background-color: #333; /* Dark Grey */
+            color: #fff; /* White */
+            border: none;
+            border-radius: 5px;
+            padding: 15px 40px;
+            font-size: 22px;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.3s, box-shadow 0.3s;
+            box-shadow: 0 6px 12px rgba(0,0,0,0.4);
+        }
+
+        #start-btn:hover {
+            background-color: #ff0000; /* Red on hover */
+            transform: translateY(-3px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Additional Progress Bars */
+        #generating-story-container,
+        #generating-image-container {
+            display: none;
+            margin-bottom: 15px;
+        }
+
+        /* SVG Icon Styles */
+        .icon-svg {
+            width: 28px;
+            height: 28px;
+            fill: #fff; /* White color */
+            transition: transform 0.3s;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 768px) {
+            header {
+                padding: 15px 20px; /* Reduce horizontal padding on smaller screens */
+            }
+
+            .header-content {
+                gap: 10px; /* Reduce gap between icons and logo */
+            }
+
+            .option-btn {
+                font-size: 18px;
+                padding: 12px 16px;
+            }
+
+            #start-screen h1 {
+                font-size: 28px;
+            }
+
+            #start-screen p {
+                font-size: 18px;
+            }
+
+            #start-btn {
+                font-size: 20px;
+                padding: 12px 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <!-- PumpFun Icon -->
+            <a href="https://pump.fun/board" id="pump-link" title="PumpFun" target="_blank" rel="noopener noreferrer">
+                <!-- Inline SVG for PumpFun (example: Chart Line) -->
+                <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512">
+                    <!-- Example icon: fa-chart-line from Font Awesome -->
+                    <path d="M528 352h-128V48c0-26.51-21.49-48-48-48h-32c-26.51 0-48 21.49-48 48v304H48c-26.51 0-48 21.49-48 48v32c0 26.51 21.49 48 48 48h480c26.51 0 48-21.49 48-48v-32c0-26.51-21.49-48-48-48zM96 464c-8.837 0-16-7.163-16-16v-32c0-8.837 7.163-16 16-16h48c8.837 0 16 7.163 16 16v32c0 8.837-7.163 16-16 16H96zm160-112c-8.837 0-16-7.163-16-16v-80c0-8.837 7.163-16 16-16h48c8.837 0 16 7.163 16 16v80c0 8.837-7.163 16-16 16h-48zm160 0c-8.837 0-16-7.163-16-16v-160c0-8.837 7.163-16 16-16h48c8.837 0 16 7.163 16 16v160c0 8.837-7.163 16-16 16h-48zM96 288c-8.837 0-16-7.163-16-16v-32c0-8.837 7.163-16 16-16h48c8.837 0 16 7.163 16 16v32c0 8.837-7.163 16-16 16H96z"/>
+                </svg>
+            </a>
+            <!-- X Icon -->
+            <a href="https://x.com/QUESTAI_SOL" id="x-link" title="X" target="_blank" rel="noopener noreferrer">
+                <!-- Inline SVG for X (example: Times icon) -->
+                <svg class="icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 352 512">
+                    <!-- Example icon: fa-times from Font Awesome -->
+                    <path d="M242.72 256l100.07-100.07c12.28-12.28 12.28-32.19 0-44.48l-22.24-22.24c-12.28-12.28-32.19-12.28-44.48 0L176 189.28 75.93 89.21c-12.28-12.28-32.19-12.28-44.48 0L9.21 111.45c-12.28 12.28-12.28 32.19 0 44.48L109.28 256 9.21 356.07c-12.28 12.28-12.28 32.19 0 44.48l22.24 22.24c12.28 12.28 32.19 12.28 44.48 0L176 322.72l100.07 100.07c12.28 12.28 32.19 12.28 44.48 0l22.24-22.24c12.28-12.28 12.28-32.19 0-44.48L242.72 256z"/>
+                </svg>
+            </a>
+            <!-- Logo -->
+            <h1>CryptoAI Quest</h1>
+        </div>
+    </header>
+
+    <!-- Container for Story and Image -->
+    <div id="container" style="display: none;">
+        <div class="text-section">
+            <!-- Generating Story Progress Bar -->
+            <div id="generating-story-container">
+                <p>Generating Story...</p>
+                <div class="progress-container">
+                    <div class="progress-bar" id="story-progress-bar"></div>
+                </div>
+            </div>
+
+            <!-- Story Content (Question and Options) -->
+            <div id="story-content" style="display: none;">
+                <p id="story-text" style="font-size: 24px; color: #fff;"></p> <!-- Question text in White -->
+                <div id="options" class="options-container"></div>
+            </div>
+        </div>
+        <div class="image-section">
+            <!-- Generating Image Progress Bar -->
+            <div id="generating-image-container">
+                <p>Generating AI-Generated Image...</p>
+                <div class="progress-container">
+                    <div class="progress-bar" id="image-progress-bar"></div>
+                </div>
+            </div>
+
+            <h2>AI-Generated Image</h2>
+            <img id="chapter-image" class="chapter-image" src="" alt="AI Generated Image">
+        </div>
+    </div>
+
+    <!-- Start Screen -->
+    <div id="start-screen">
+        <h1>Welcome to CryptoAI Quest</h1>
+        <p>Join Max on his journey into the world of crypto and memecoins.</p>
+        <button id="start-btn">Start</button>
+    </div>
+
+    <!-- Footer removed as requested -->
+
+    <script>
+        const storyData = {
+            "chapter1": {
+                "text": "Max is sitting on the couch watching the news. A report says the crypto market is booming. Bitcoin, Ethereum, and other coins are at all-time highs.",
+                "options": {
+                    "A": "Ignore the news – crypto is just a hype.",
+                    "B": "Search 'crypto' on TikTok to see what’s trending.",
+                    "C": "Talk to your friend Alex who knows about crypto."
+                },
+                "next": {
+                    "A": "end_no_risk",
+                    "B": "chapter2b",
+                    "C": "chapter2c"
+                },
+                "imageDescription": "Max sitting on a couch watching TV with a concerned expression."
+            },
+            "chapter2b": {
+                "text": "Max searches TikTok and discovers many memes and trends around crypto. He's fascinated by the excitement.",
+                "options": {
+                    "A": "Invest in the trendiest memecoins.",
+                    "B": "Observe the market a bit longer before deciding."
+                },
+                "next": {
+                    "A": "chapter3a",
+                    "B": "chapter3b"
+                },
+                "imageDescription": "Max browsing TikTok on his smartphone, surrounded by colorful crypto memes."
+            },
+            "chapter2c": {
+                "text": "Alex explains to Max the basics of cryptocurrencies and how to invest safely.",
+                "options": {
+                    "A": "Follow Alex and invest together.",
+                    "B": "Thank Alex and remain cautious."
+                },
+                "next": {
+                    "A": "chapter3c",
+                    "B": "end_no_risk"
+                },
+                "imageDescription": "Alex showing Max information on a laptop about cryptocurrencies."
+            },
+            "chapter3a": {
+                "text": "Max invests in several trending memecoins. The market is volatile, and he starts seeing quick gains.",
+                "options": {
+                    "A": "Reinvest the profits into more memecoins.",
+                    "B": "Take profits and cash out while the market is hot."
+                },
+                "next": {
+                    "A": "chapter4a",
+                    "B": "chapter4b"
+                },
+                "imageDescription": "Max excitedly looking at his growing investment portfolio on his laptop."
+            },
+            "chapter3b": {
+                "text": "Max decides to wait and observe the market trends. Over time, the market stabilizes.",
+                "options": {
+                    "A": "Finally invest a small amount into a promising cryptocurrency.",
+                    "B": "Continue to stay out of the crypto market."
+                },
+                "next": {
+                    "A": "chapter4c",
+                    "B": "end_no_risk"
+                },
+                "imageDescription": "Max thoughtfully watching stock charts and market trends on his computer."
+            },
+            "chapter3c": {
+                "text": "Max and Alex start investing together. They carefully select a mix of established and emerging cryptocurrencies.",
+                "options": {
+                    "A": "Develop a diversified investment portfolio.",
+                    "B": "Focus solely on high-risk, high-reward investments."
+                },
+                "next": {
+                    "A": "chapter4d",
+                    "B": "chapter4e"
+                },
+                "imageDescription": "Max and Alex discussing investment strategies with charts and graphs on a screen."
+            },
+            "chapter4a": {
+                "text": "Max reinvests his profits into more memecoins, chasing the next big surge. However, the market takes a downturn, and he faces significant losses.",
+                "options": {
+                    "A": "Panic sell all investments to prevent further losses.",
+                    "B": "Hold on and wait for the market to recover."
+                },
+                "next": {
+                    "A": "end_loss",
+                    "B": "chapter5a"
+                },
+                "imageDescription": "Max looking distressed as he watches his investment losses accumulate on his screen."
+            },
+            "chapter4b": {
+                "text": "Max takes his profits and cashes out while the market is booming. He secures a healthy return on his initial investment.",
+                "options": {
+                    "A": "Reinvest the profits into other investment opportunities.",
+                    "B": "Save the profits and consider retirement."
+                },
+                "next": {
+                    "A": "end_success",
+                    "B": "end_secure"
+                },
+                "imageDescription": "Max smiling as he transfers his earnings to his bank account."
+            },
+            "chapter4c": {
+                "text": "Max invests a small amount into a promising cryptocurrency that gradually gains value. His cautious approach pays off.",
+                "options": {
+                    "A": "Increase his investment in the successful cryptocurrency.",
+                    "B": "Diversify his investments to include other assets."
+                },
+                "next": {
+                    "A": "end_growth",
+                    "B": "end_diversified"
+                },
+                "imageDescription": "Max reviewing his growing investment portfolio with a satisfied expression."
+            },
+            "chapter4d": {
+                "text": "Max and Alex develop a diversified investment portfolio, balancing high-risk and stable cryptocurrencies. Their strategy yields consistent returns.",
+                "options": {
+                    "A": "Expand their portfolio to include international cryptocurrencies.",
+                    "B": "Maintain their current strategy and monitor the market closely."
+                },
+                "next": {
+                    "A": "end_expanded",
+                    "B": "end_stable"
+                },
+                "imageDescription": "Max and Alex analyzing a diversified portfolio with various cryptocurrency icons."
+            },
+            "chapter4e": {
+                "text": "Focusing solely on high-risk, high-reward investments, Max and Alex experience roller-coaster market fluctuations. While they gain significantly during bull runs, they also suffer during bear markets.",
+                "options": {
+                    "A": "Shift to a more balanced investment strategy.",
+                    "B": "Double down on high-risk investments to maximize potential gains."
+                },
+                "next": {
+                    "A": "end_balance",
+                    "B": "end_extreme"
+                },
+                "imageDescription": "Max and Alex anxiously watching fluctuating cryptocurrency charts with intense expressions."
+            },
+            // Endings
+            "end_no_risk": {
+                "text": "Max remains cautious and never invests in crypto. No profit, no loss.",
+                "imageDescription": "Max sitting peacefully without engaging in any investments."
+            },
+            "end_loss": {
+                "text": "Max panics and sells all his investments at a loss. He regrets his impulsive decisions.",
+                "imageDescription": "Max looking regretful as he reviews his failed investments."
+            },
+            "end_success": {
+                "text": "Max secures a healthy return from his investments and considers it a successful venture.",
+                "imageDescription": "Max celebrating his investment success with a smile."
+            },
+            "end_secure": {
+                "text": "Max saves his profits wisely and plans for a comfortable future.",
+                "imageDescription": "Max contentedly planning his financial future with documents and a laptop."
+            },
+            "end_growth": {
+                "text": "Max's cautious investment grows steadily, providing him with financial stability.",
+                "imageDescription": "Max observing his steadily growing investment portfolio with satisfaction."
+            },
+            "end_diversified": {
+                "text": "Max diversifies his investments, spreading risk and ensuring consistent returns.",
+                "imageDescription": "Max happily managing a diversified portfolio with multiple assets."
+            },
+            "end_expanded": {
+                "text": "Max and Alex expand their portfolio internationally, tapping into new markets and increasing their returns.",
+                "imageDescription": "Max and Alex exploring global cryptocurrency markets on their devices."
+            },
+            "end_stable": {
+                "text": "Max and Alex maintain a stable investment strategy, enjoying consistent and reliable returns.",
+                "imageDescription": "Max and Alex relaxedly monitoring their stable investments."
+            },
+            "end_balance": {
+                "text": "Max achieves a balanced investment strategy, mitigating risks while enjoying growth.",
+                "imageDescription": "Max managing a balanced portfolio with confidence."
+            },
+            "end_extreme": {
+                "text": "Max doubles down on high-risk investments, facing extreme volatility. While he experiences significant gains, the stress takes a toll.",
+                "imageDescription": "Max under stress, juggling multiple high-risk investments on his screens."
+            }
+        };
+
+        let currentChapter = "chapter1";
+
+        // Helper function to convert chapter ID to image filename
+        function getImageFilename(chapterId) {
+            if (chapterId.startsWith("chapter")) {
+                return `${chapterId}.webp`;
+            } else if (chapterId.startsWith("end_")) {
+                const parts = chapterId.split('_').slice(1);
+                const pascalCase = parts.map(part => part.charAt(0).toUpperCase() + part.slice(1)).join('');
+                return `End${pascalCase}.webp`;
+            }
+            return null;
+        }
+
+        // Load a story chapter with "Generating Story"
+        function loadStoryChapter(chapterId) {
+            const generatingStoryContainer = document.getElementById("generating-story-container");
+            const storyContent = document.getElementById("story-content");
+
+            // Show "Generating Story" progress bar
+            generatingStoryContainer.style.display = "block";
+            storyContent.style.display = "none";
+            const progressBar = document.getElementById("story-progress-bar");
+            progressBar.style.transition = 'none';
+            progressBar.style.width = '0%';
+            // Force reflow to reset the transition
+            void progressBar.offsetWidth;
+            progressBar.style.transition = 'width 3s ease-in-out';
+            progressBar.style.width = '100%';
+
+            // After 3 seconds, hide the progress bar and show the story content
+            setTimeout(() => {
+                generatingStoryContainer.style.display = "none";
+                storyContent.style.display = "flex";
+                loadChapter(chapterId);
+            }, 3000);
+        }
+
+        // Load a chapter: show the question and options
+        function loadChapter(chapterId) {
+            const chapter = storyData[chapterId];
+            document.getElementById("story-text").innerText = chapter.text;
+
+            const optionsDiv = document.getElementById("options");
+            optionsDiv.innerHTML = ""; // Clear existing buttons
+
+            if (chapter.options) { // Check if there are options
+                for (let key in chapter.options) {
+                    const button = document.createElement("button");
+                    button.classList.add("option-btn");
+                    button.innerText = chapter.options[key];
+
+                    // Add event listener for button click
+                    button.onclick = () => handleOptionClick(button, chapter.next[key]);
+
+                    optionsDiv.appendChild(button);
+                }
+            } else {
+                // If no options are available, show a "Restart" button
+                const restartBtn = document.createElement("button");
+                restartBtn.classList.add("option-btn");
+                restartBtn.innerText = "Restart";
+                restartBtn.onclick = () => resetStory();
+                optionsDiv.appendChild(restartBtn);
+            }
+        }
+
+        // Generate AI-Generated Image
+        function generateImage(chapterId) {
+            const generatingImageContainer = document.getElementById("generating-image-container");
+            const chapterImage = document.getElementById("chapter-image");
+            chapterImage.style.display = "none";
+
+            // Show "Generating AI-Generated Image" progress bar
+            generatingImageContainer.style.display = "block";
+            const imageProgressBar = document.getElementById("image-progress-bar");
+            imageProgressBar.style.transition = 'none';
+            imageProgressBar.style.width = '0%';
+            // Force reflow to reset the transition
+            void imageProgressBar.offsetWidth;
+            imageProgressBar.style.transition = 'width 3s ease-in-out';
+            imageProgressBar.style.width = '100%';
+
+            // After 3 seconds, hide the progress bar and show the image
+            setTimeout(() => {
+                generatingImageContainer.style.display = "none";
+                loadImage(chapterId);
+                // After loading the image, load the next story chapter
+                loadStoryChapter(chapterId);
+            }, 3000);
+        }
+
+        // Load and display the image
+        function loadImage(chapterId) {
+            const chapter = storyData[chapterId];
+            const imageFilename = getImageFilename(chapterId);
+            const chapterImage = document.getElementById("chapter-image");
+
+            if (imageFilename) {
+                chapterImage.src = `Images/${imageFilename}`;
+                chapterImage.alt = chapter.imageDescription;
+                chapterImage.classList.remove("visible");
+                chapterImage.style.display = "block"; // Show the image
+
+                // Remove previous Event Listeners
+                chapterImage.replaceWith(chapterImage.cloneNode(true));
+                const newChapterImage = document.getElementById("chapter-image");
+
+                // Add new Event Listener
+                newChapterImage.addEventListener('load', () => {
+                    newChapterImage.classList.add("visible");
+                }, { once: true });
+            } else {
+                chapterImage.src = '';
+                chapterImage.alt = '';
+                chapterImage.classList.remove("visible");
+                chapterImage.style.display = "none"; // Hide the image
+            }
+        }
+
+        // Handle button click
+        function handleOptionClick(button, nextId) {
+            // Disable all buttons and highlight the selected one
+            const buttons = document.querySelectorAll(".option-btn");
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.add("disabled");
+                btn.classList.remove("selected"); // Remove 'selected' class from all buttons
+            });
+
+            button.classList.remove("disabled");
+            button.classList.add("selected");
+
+            // Update the current chapter and generate image
+            currentChapter = nextId;
+            generateImage(nextId);
+        }
+
+        // Reset the story
+        function resetStory() {
+            currentChapter = "chapter1";
+            document.getElementById("start-screen").style.display = "flex";
+            document.getElementById("container").style.display = "none";
+
+            // Remove image and reset progress bars
+            const chapterImage = document.getElementById("chapter-image");
+            chapterImage.src = '';
+            chapterImage.alt = '';
+            chapterImage.classList.remove("visible");
+            chapterImage.style.display = "none";
+
+            const storyProgressBar = document.getElementById("story-progress-bar");
+            storyProgressBar.style.transition = 'none';
+            storyProgressBar.style.width = "0%";
+
+            const imageProgressBar = document.getElementById("image-progress-bar");
+            imageProgressBar.style.transition = 'none';
+            imageProgressBar.style.width = "0%";
+
+            const generatingStoryContainer = document.getElementById("generating-story-container");
+            generatingStoryContainer.style.display = "none";
+
+            const generatingImageContainer = document.getElementById("generating-image-container");
+            generatingImageContainer.style.display = "none";
+
+            const storyContent = document.getElementById("story-content");
+            storyContent.style.display = "none";
+
+            const optionsDiv = document.getElementById("options");
+            optionsDiv.innerHTML = ""; // Clear existing buttons
+        }
+
+        // Start the story
+        document.getElementById("start-btn").onclick = () => {
+            document.getElementById("start-screen").style.display = "none";
+            document.getElementById("container").style.display = "flex";
+            loadStoryChapter(currentChapter);
+        };
+
+        // Reset to the start screen when X icon is clicked
+        document.getElementById("x-link").onclick = (e) => {
+            e.preventDefault(); // Prevent default link behavior
+            resetStory();
+        };
+
+        // Ensure Progress Bars are reset on page load
+        window.addEventListener('load', () => {
+            const chapterImage = document.getElementById("chapter-image");
+            chapterImage.classList.remove("visible");
+            chapterImage.style.display = "none";
+
+            const storyProgressBar = document.getElementById("story-progress-bar");
+            storyProgressBar.style.width = "0%";
+
+            const imageProgressBar = document.getElementById("image-progress-bar");
+            imageProgressBar.style.width = "0%";
+
+            const generatingStoryContainer = document.getElementById("generating-story-container");
+            generatingStoryContainer.style.display = "none";
+
+            const generatingImageContainer = document.getElementById("generating-image-container");
+            generatingImageContainer.style.display = "none";
+
+            const storyContent = document.getElementById("story-content");
+            storyContent.style.display = "none";
+        });
+    </script>
+</body>
+</html>
